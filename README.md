@@ -1,16 +1,33 @@
 
 ## Aufgabe
 
-Verwende bitte zu diesem frühen Zeitpunkt KEIN AI Pair Programming, um Dir selbst eine Chance zu geben, die Sprache Kotlin zu erlernen. Beherrscht Du diese, kannst Du Dich gern von KI unterstützen lassen.
+```
+Project Stucture: 
+app/src/main/java/com/example/workouttracker/
+├── MainActivity.kt                 # Haupt-Activity (Standard Android Studio)
+├── data/                          # Datenlogik
+│   ├── model/                    
+│   │   ├── Exercise.kt           # Datenmodell für Übungen
+│   │   ├── WorkoutSession.kt     # Datenmodell für Workout-Sessions  
+│   │   └── WorkoutState.kt       # Enum für Workout-Zustände
+│   └── repository/               
+│       └── WorkoutRepository.kt  # Datenverwaltung und SharedPreferences
+├── ui/                           # UI-Komponenten
+│   └── viewmodel/               # In Arbeit!!
+└── utils/                       # Utility Classes (geplant)
 
-Du entwickelst eine Workout-App für Android mit Kotlin, die Usern durch ein strukturiertes Training führt.
-
-Jede Übung wird mit Text und Bild beschrieben, zwischen den Übungen gibt es Pausen, und Soundeffekte signalisieren Start und Ende der Übungen und Pausen.
-
-Zusätzlich wird eine Fortschrittsanzeige integriert, um die Motivation der User zu erhöhen.
-
-
-
+app/src/main/res/
+├── drawable/                     # Vorbereitet
+│   └── ic_*.xml                 # Übungs-Icons (Vector Assets)
+├── layout/
+│   └── activity_main.xml        # Alles hier untendrunter Zu implementieren
+├── values/
+│   ├── colors.xml              # 
+│   └── styles.xml              # 
+└── raw/                        # 
+    └── *.mp3                   # Sound-Dateien für Übungen
+```
+    
 Erstelle eine Workout-App, die folgende Funktionen umfasst:
 
     Verschiedene Übungen mit Text- und Bildbeschreibung
