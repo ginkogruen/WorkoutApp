@@ -58,7 +58,7 @@ class WorkoutRepository(private val context: Context) {
                 name = "Jumping Jacks",
                 description = "Hampelmänner für Cardio-Training. " +
                         "Rhythmische Sprungbewegung mit Arm- und Beinbewegung.",
-                imageResourceId = R.drawable.ic_jumping_jacks,
+                imageResourceId = R.drawable.ic_sit_ups,
                 duration = 30
             ),
             Exercise(

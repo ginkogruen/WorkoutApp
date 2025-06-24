@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PrimaryButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/primary_button_background</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SecondaryButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/secondary_button_background</item>
+        <item name="android:textColor">@color/primary_color</item>
+    </style>
+</resources>
