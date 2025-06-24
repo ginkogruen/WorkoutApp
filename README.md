@@ -1,6 +1,7 @@
 
 ## Aufgabe
 
+```
 Project Stucture: 
 app/src/main/java/com/example/workouttracker/
 ├── MainActivity.kt                 # Haupt-Activity (Standard Android Studio)
@@ -25,7 +26,7 @@ app/src/main/res/
 │   └── styles.xml              # 
 └── raw/                        # 
     └── *.mp3                   # Sound-Dateien für Übungen
-
+```
     
 Erstelle eine Workout-App, die folgende Funktionen umfasst:
 
