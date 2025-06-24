@@ -17,7 +17,7 @@ app/src/main/java/com/example/workouttracker/
 └── utils/                       # Utility Classes (geplant)
 
 app/src/main/res/
-├── drawable/                     # ✅ Vorbereitet
+├── drawable/                     # Vorbereitet
 │   └── ic_*.xml                 # Übungs-Icons (Vector Assets)
 ├── layout/
 │   └── activity_main.xml        # Alles hier untendrunter Zu implementieren
