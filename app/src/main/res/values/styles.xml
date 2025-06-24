@@ -7,7 +7,7 @@
     </style>
 
     <style name="SecondaryButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">@drawable/secondary_button_background</item>
+        <item name="android:background">@drawable/primary_button_background</item>
         <item name="android:textColor">@color/primary_color</item>
     </style>
 </resources>

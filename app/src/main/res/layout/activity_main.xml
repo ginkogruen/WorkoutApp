@@ -62,7 +62,7 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:background="@drawable/rounded_image_background"
+            android:background="@drawable/rounded_background"
             android:layout_marginBottom="16dp"
             android:visibility="gone" />
 

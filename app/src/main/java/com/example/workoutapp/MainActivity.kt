@@ -21,8 +21,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.workoutapp.data.model.Exercise
+import com.example.workoutapp.data.model.WorkoutState
+import com.example.workoutapp.data.model.WorkoutSession
 import com.example.workoutapp.data.repository.WorkoutRepository
 import com.example.workoutapp.ui.viewmodel.WorkoutViewModel
+
 
 // MainActivity.kt
 class MainActivity : AppCompatActivity() {
