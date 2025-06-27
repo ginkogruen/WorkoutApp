@@ -1,18 +1,7 @@
 package com.example.workoutapp
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.workoutapp.ui.theme.WorkoutAppTheme
 import android.app.AlertDialog
+import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -20,10 +9,9 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.example.workoutapp.data.model.Exercise
 import com.example.workoutapp.data.model.WorkoutState
-import com.example.workoutapp.data.model.WorkoutSession
-import com.example.workoutapp.data.repository.WorkoutRepository
 import com.example.workoutapp.ui.viewmodel.WorkoutViewModel
 
 
@@ -33,12 +21,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: WorkoutViewModel
     private var isWorkoutRunning = false
     private var isPaused = false
+    private lateinit var soundPlayer: SoundPlayer
+    private var previousState: WorkoutState? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         viewModel = ViewModelProvider(this)[WorkoutViewModel::class.java]
+        soundPlayer = SoundPlayer(this)
 
         setupUI()
         observeViewModel()
@@ -87,7 +78,9 @@ class MainActivity : AppCompatActivity() {
     private fun updateExerciseDisplay(exercise: Exercise?) {
         findViewById<ImageView>(R.id.iv_exercise).apply {
             if (exercise != null) {
-                setImageResource(exercise.imageResourceId)
+                Glide.with(this@MainActivity)
+                    .load(exercise.imageResourceId)
+                    .into(this)
                 visibility = View.VISIBLE
             } else {
                 visibility = View.GONE
@@ -115,29 +108,48 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateStateDisplay(state: WorkoutState) {
         val stateText = findViewById<TextView>(R.id.tv_state)
+        val startPauseButton = findViewById<Button>(R.id.btn_start_pause)
+
+        // Play sounds based on state transitions
         when (state) {
             WorkoutState.IDLE -> {
-                stateText.text = "Bereit zum Training?"
+                stateText.text = "🚀 Bereit zum Training?"
                 isWorkoutRunning = false
                 isPaused = false
-                findViewById<Button>(R.id.btn_start_pause).text = "Start"
+                startPauseButton.text = "▶️ Start"
             }
             WorkoutState.EXERCISE -> {
-                stateText.text = "Übung läuft"
+                stateText.text = "💪 Übung läuft"
                 isWorkoutRunning = true
-                findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                startPauseButton.text = "⏸️ Pause"
+                if (previousState == WorkoutState.REST) {
+                    // End Pause
+                    soundPlayer.playSound(R.raw.ep_542042__rob_marion__gasp_ui_alert_2)
+                } else {
+                    // Start Exercise
+                    soundPlayer.playSound(R.raw.se_542035__rob_marion__gasp_ui_notification_4)
+                }
             }
             WorkoutState.REST -> {
-                stateText.text = "Pause"
+                stateText.text = "⏱️ Pause"
                 isWorkoutRunning = true
-                findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                startPauseButton.text = "⏸️ Pause"
+                if (previousState == WorkoutState.EXERCISE) {
+                    // End Exercise
+                    soundPlayer.playSound(R.raw.ee_542009__rob_marion__gasp_marimba_correct_2)
+                } else {
+                    // Start Pause
+                    soundPlayer.playSound(R.raw.sp_541987__rob_marion__gasp_ui_clicks_5)
+                }
             }
             WorkoutState.COMPLETED -> {
-                stateText.text = "Workout abgeschlossen!"
+                stateText.text = "🎉 Workout abgeschlossen!"
                 isWorkoutRunning = false
-                findViewById<Button>(R.id.btn_start_pause).text = "Start"
+                startPauseButton.text = "▶️ Start"
+                soundPlayer.playSound(R.raw.ee_542009__rob_marion__gasp_marimba_correct_2)
             }
         }
+        previousState = state
     }
 
     private fun updateProgressDisplay(current: Int, total: Int) {
@@ -156,6 +168,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleStartPauseClick() {
+        val startPauseButton = findViewById<Button>(R.id.btn_start_pause)
+
         when {
             !isWorkoutRunning && !isPaused -> {
                 viewModel.startWorkout()
@@ -163,12 +177,12 @@ class MainActivity : AppCompatActivity() {
             isWorkoutRunning && !isPaused -> {
                 viewModel.pauseWorkout()
                 isPaused = true
-                findViewById<Button>(R.id.btn_start_pause).text = "Fortsetzen"
+                startPauseButton.text = "▶️ Fortsetzen"
             }
             isPaused -> {
                 viewModel.resumeWorkout()
                 isPaused = false
-                findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                startPauseButton.text = "⏸️ Pause"
             }
         }
     }
@@ -176,7 +190,7 @@ class MainActivity : AppCompatActivity() {
     private fun resetUI() {
         isWorkoutRunning = false
         isPaused = false
-        findViewById<Button>(R.id.btn_start_pause).text = "Start"
+        findViewById<Button>(R.id.btn_start_pause).text = "▶️ Start"
         findViewById<TextView>(R.id.tv_timer).visibility = View.GONE
     }
 
@@ -186,5 +200,10 @@ class MainActivity : AppCompatActivity() {
             .setMessage("Du hast das Workout erfolgreich abgeschlossen!")
             .setPositiveButton("OK") { _, _ -> }
             .show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        soundPlayer.release()
     }
 }
