@@ -34,7 +34,7 @@ class WorkoutRepository(private val context: Context) {
                 name = "Push-ups",
                 description = "Klassische Liegestütze für Brust- und Armmuskulatur. " +
                         "Hände schulterbreit aufstellen, Körper gerade halten.",
-                imageResourceId = R.drawable.ic_pushups,
+                imageResourceId = R.drawable.resistance_band_push_ups_3631796511,
                 duration = 30
             ),
             Exercise(
@@ -42,7 +42,7 @@ class WorkoutRepository(private val context: Context) {
                 name = "Squats",
                 description = "Kniebeugen für Bein- und Gesäßmuskulatur. " +
                         "Füße hüftbreit, Po nach hinten schieben.",
-                imageResourceId = R.drawable.ic_squats,
+                imageResourceId = R.drawable.bodyweight_squat_example_2650866943,
                 duration = 30
             ),
             Exercise(
@@ -50,15 +50,15 @@ class WorkoutRepository(private val context: Context) {
                 name = "Plank",
                 description = "Unterarmstütz für Core-Stabilität. " +
                         "Körper bildet eine gerade Linie vom Kopf bis zu den Füßen.",
-                imageResourceId = R.drawable.ic_plank,
+                imageResourceId = R.drawable.body_saw_plank_3580357734,
                 duration = 30
             ),
             Exercise(
                 id = 4,
-                name = "Jumping Jacks",
-                description = "Hampelmänner für Cardio-Training. " +
-                        "Rhythmische Sprungbewegung mit Arm- und Beinbewegung.",
-                imageResourceId = R.drawable.ic_sit_ups,
+                name = "Sit-Ups",
+                description = "Bauchmuskeltraining für eine starke Körpermitte. " +
+                        "Auf den Rücken legen und Oberkörper anheben.",
+                imageResourceId = R.drawable.sit_ups_2_1000x1000_2124161126,
                 duration = 30
             ),
             Exercise(
@@ -66,7 +66,7 @@ class WorkoutRepository(private val context: Context) {
                 name = "Lunges",
                 description = "Ausfallschritte für Beinmuskulatur. " +
                         "Großer Schritt nach vorn, Knie im 90°-Winkel beugen.",
-                imageResourceId = R.drawable.ic_lunges,
+                imageResourceId = R.drawable.klassische_lunges_uebung_2434463905,
                 duration = 30
             )
         )

@@ -1,18 +1,7 @@
 package com.example.workoutapp
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.workoutapp.ui.theme.WorkoutAppTheme
 import android.app.AlertDialog
+import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -20,10 +9,9 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.example.workoutapp.data.model.Exercise
 import com.example.workoutapp.data.model.WorkoutState
-import com.example.workoutapp.data.model.WorkoutSession
-import com.example.workoutapp.data.repository.WorkoutRepository
 import com.example.workoutapp.ui.viewmodel.WorkoutViewModel
 
 
@@ -90,7 +78,9 @@ class MainActivity : AppCompatActivity() {
     private fun updateExerciseDisplay(exercise: Exercise?) {
         findViewById<ImageView>(R.id.iv_exercise).apply {
             if (exercise != null) {
-                setImageResource(exercise.imageResourceId)
+                Glide.with(this@MainActivity)
+                    .load(exercise.imageResourceId)
+                    .into(this)
                 visibility = View.VISIBLE
             } else {
                 visibility = View.GONE
