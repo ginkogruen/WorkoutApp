@@ -9,33 +9,53 @@ import androidx.lifecycle.MutableLiveData
 import com.example.workoutapp.data.model.Exercise
 import com.example.workoutapp.data.model.WorkoutState
 
+/**
+ * ViewModel für die Workout-Geschäftslogik
+ * Verwaltet den Workout-Ablauf, Timer-Funktionalität und Zustandsänderungen
+ * Implementiert MVVM-Pattern und trennt UI-Logik von Geschäftslogik
+ */
 class WorkoutViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
-        private const val EXERCISE_TIME = 30 * 1000L // 30 Sekunden
-        private const val REST_TIME = 15 * 1000L // 15 Sekunden
+        // Konstanten für Timer-Dauern
+        private const val EXERCISE_TIME = 30 * 1000L // 30 Sekunden pro Übung
+        private const val REST_TIME = 15 * 1000L // 15 Sekunden Pause zwischen Übungen
+
+        // SharedPreferences Konstanten
         private const val PREFS_NAME = "workout_prefs"
         private const val COMPLETED_WORKOUTS_KEY = "completed_workouts"
     }
 
+    // LiveData für die aktuelle Übung (beobachtbar von der UI)
     private val _currentExercise = MutableLiveData<Exercise?>(null)
     val currentExercise: LiveData<Exercise?> = _currentExercise
 
+    // LiveData für die verbleibende Zeit des aktuellen Timers
     private val _timeRemaining = MutableLiveData(0L)
     val timeRemaining: LiveData<Long> = _timeRemaining
 
+    // LiveData für den aktuellen Workout-Zustand
     private val _workoutState = MutableLiveData(WorkoutState.IDLE)
     val workoutState: LiveData<WorkoutState> = _workoutState
 
+    // LiveData für den Fortschritt (aktuelle Übung / Gesamtübungen)
     private val _progress = MutableLiveData(Pair(0, 0))
     val progress: LiveData<Pair<Int, Int>> = _progress
 
+    // LiveData für Workout-Abschluss-Status
     private val _isWorkoutComplete = MutableLiveData(false)
     val isWorkoutComplete: LiveData<Boolean> = _isWorkoutComplete
 
+    // Timer-Instanz für Countdown-Funktionalität
     private var timer: CountDownTimer? = null
+
+    // Liste der Workout-Übungen
     private var exercises = mutableListOf<Exercise>()
+
+    // Index der aktuell aktiven Übung
     private var currentExerciseIndex = -1
+
+    // Gespeicherte Zeit bei Pause-Funktionalität
     private var pausedTimeRemaining = 0L
 
     init {
@@ -43,6 +63,10 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         _progress.value = Pair(0, exercises.size)
     }
 
+    /**
+     * Lädt die Übungen für das Workout
+     * TODO: In Zukunft aus Repository/Datenbank laden
+     */
     private fun loadExercises() {
         // Hier könnten die Übungen aus einer Datenbank oder einer anderen Quelle geladen werden
         // Für jetzt verwenden wir Beispielübungen
@@ -60,6 +84,9 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         )
     }
 
+    /**
+     * Startet ein neues Workout oder setzt ein abgeschlossenes zurück
+     */
     fun startWorkout() {
         if (_workoutState.value == WorkoutState.IDLE || _workoutState.value == WorkoutState.COMPLETED) {
             currentExerciseIndex = -1
@@ -68,15 +95,24 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    /**
+     * Pausiert das laufende Workout und speichert die verbleibende Zeit
+     */
     fun pauseWorkout() {
         timer?.cancel()
         pausedTimeRemaining = _timeRemaining.value ?: 0L
     }
 
+    /**
+     * Setzt das Workout mit der gespeicherten Zeit fort
+     */
     fun resumeWorkout() {
         startTimer(pausedTimeRemaining)
     }
 
+    /**
+     * Setzt das komplette Workout auf den Ausgangszustand zurück
+     */
     fun resetWorkout() {
         timer?.cancel()
         _currentExercise.value = null
@@ -87,42 +123,61 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         currentExerciseIndex = -1
     }
 
+    /**
+     * Wechselt zur nächsten Übung oder beendet das Workout
+     * Verwaltet die Workout-Progression
+     */
     private fun nextExercise() {
         timer?.cancel()
         currentExerciseIndex++
 
+        // Prüfen ob alle Übungen abgeschlossen sind
         if (currentExerciseIndex >= exercises.size) {
             completeWorkout()
             return
         }
 
+        // Nächste Übung setzen und Timer starten
         _currentExercise.value = exercises[currentExerciseIndex]
         _progress.value = Pair(currentExerciseIndex + 1, exercises.size)
         _workoutState.value = WorkoutState.EXERCISE
         startTimer(EXERCISE_TIME)
     }
 
+    /**
+     * Startet eine Pause zwischen den Übungen
+     */
     private fun startRest() {
         _workoutState.value = WorkoutState.REST
         startTimer(REST_TIME)
     }
 
+    /**
+     * Startet einen Countdown-Timer mit der angegebenen Dauer
+     * @param duration Timer-Dauer in Millisekunden
+     */
     private fun startTimer(duration: Long) {
         timer = object : CountDownTimer(duration, 1000) {
+            // Wird jede Sekunde aufgerufen
             override fun onTick(millisUntilFinished: Long) {
                 _timeRemaining.value = millisUntilFinished / 1000
             }
 
+            // Wird aufgerufen wenn Timer abläuft
             override fun onFinish() {
-                if (_workoutState.value == WorkoutState.EXERCISE) {
-                    startRest()
-                } else if (_workoutState.value == WorkoutState.REST) {
-                    nextExercise()
+                when (_workoutState.value) {
+                    WorkoutState.EXERCISE -> startRest() // Nach Übung kommt Pause
+                    WorkoutState.REST -> nextExercise() // Nach Pause kommt nächste Übung
+                    else -> {} // Andere Zustände ignorieren
                 }
             }
         }.start()
     }
 
+    /**
+     * Beendet das Workout und markiert es als abgeschlossen
+     * Speichert die Statistiken
+     */
     private fun completeWorkout() {
         timer?.cancel()
         _workoutState.value = WorkoutState.COMPLETED
@@ -131,17 +186,28 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         incrementCompletedWorkouts()
     }
 
+    /**
+     * Erhöht den Zähler für abgeschlossene Workouts in SharedPreferences
+     */
     private fun incrementCompletedWorkouts() {
         val sharedPrefs = getApplication<Application>().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val currentCount = sharedPrefs.getInt(COMPLETED_WORKOUTS_KEY, 0)
         sharedPrefs.edit().putInt(COMPLETED_WORKOUTS_KEY, currentCount + 1).apply()
     }
 
+    /**
+     * Gibt die Anzahl der abgeschlossenen Workouts zurück
+     * @return Anzahl abgeschlossener Workouts
+     */
     fun getCompletedWorkouts(): Int {
         val sharedPrefs = getApplication<Application>().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return sharedPrefs.getInt(COMPLETED_WORKOUTS_KEY, 0)
     }
 
+    /**
+     * Lifecycle-Methode: Cleanup beim Zerstören des ViewModels
+     * Stellt sicher dass Timer-Ressourcen freigegeben werden
+     */
     override fun onCleared() {
         super.onCleared()
         timer?.cancel()
