@@ -108,18 +108,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateStateDisplay(state: WorkoutState) {
         val stateText = findViewById<TextView>(R.id.tv_state)
+        val startPauseButton = findViewById<Button>(R.id.btn_start_pause)
+
         // Play sounds based on state transitions
         when (state) {
             WorkoutState.IDLE -> {
-                stateText.text = "Bereit zum Training?"
+                stateText.text = "🚀 Bereit zum Training?"
                 isWorkoutRunning = false
                 isPaused = false
-                findViewById<Button>(R.id.btn_start_pause).text = "Start"
+                startPauseButton.text = "▶️ Start"
             }
             WorkoutState.EXERCISE -> {
-                stateText.text = "Übung läuft"
+                stateText.text = "💪 Übung läuft"
                 isWorkoutRunning = true
-                findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                startPauseButton.text = "⏸️ Pause"
                 if (previousState == WorkoutState.REST) {
                     // End Pause
                     soundPlayer.playSound(R.raw.ep_542042__rob_marion__gasp_ui_alert_2)
@@ -129,9 +131,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             WorkoutState.REST -> {
-                stateText.text = "Pause"
+                stateText.text = "⏱️ Pause"
                 isWorkoutRunning = true
-                findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                startPauseButton.text = "⏸️ Pause"
                 if (previousState == WorkoutState.EXERCISE) {
                     // End Exercise
                     soundPlayer.playSound(R.raw.ee_542009__rob_marion__gasp_marimba_correct_2)
@@ -141,9 +143,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             WorkoutState.COMPLETED -> {
-                stateText.text = "Workout abgeschlossen!"
+                stateText.text = "🎉 Workout abgeschlossen!"
                 isWorkoutRunning = false
-                findViewById<Button>(R.id.btn_start_pause).text = "Start"
+                startPauseButton.text = "▶️ Start"
                 soundPlayer.playSound(R.raw.ee_542009__rob_marion__gasp_marimba_correct_2)
             }
         }
@@ -166,6 +168,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleStartPauseClick() {
+        val startPauseButton = findViewById<Button>(R.id.btn_start_pause)
+
         when {
             !isWorkoutRunning && !isPaused -> {
                 viewModel.startWorkout()
@@ -173,12 +177,12 @@ class MainActivity : AppCompatActivity() {
             isWorkoutRunning && !isPaused -> {
                 viewModel.pauseWorkout()
                 isPaused = true
-                findViewById<Button>(R.id.btn_start_pause).text = "Fortsetzen"
+                startPauseButton.text = "▶️ Fortsetzen"
             }
             isPaused -> {
                 viewModel.resumeWorkout()
                 isPaused = false
-                findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                startPauseButton.text = "⏸️ Pause"
             }
         }
     }
@@ -186,7 +190,7 @@ class MainActivity : AppCompatActivity() {
     private fun resetUI() {
         isWorkoutRunning = false
         isPaused = false
-        findViewById<Button>(R.id.btn_start_pause).text = "Start"
+        findViewById<Button>(R.id.btn_start_pause).text = "▶️ Start"
         findViewById<TextView>(R.id.tv_timer).visibility = View.GONE
     }
 
