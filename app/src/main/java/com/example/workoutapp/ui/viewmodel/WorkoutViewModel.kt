@@ -48,15 +48,15 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         // Für jetzt verwenden wir Beispielübungen
         exercises = mutableListOf(
             Exercise(1, "Kniebeugen", "Stehe mit den Füßen schulterbreit auseinander und gehe in die Hocke",
-                com.example.workoutapp.R.drawable.ic_squats),
+                com.example.workoutapp.R.drawable.bodyweight_squat_example_2650866943),
             Exercise(2, "Liegestütze", "Stütze dich mit den Händen ab und senke deinen Körper",
-                com.example.workoutapp.R.drawable.ic_pushups),
+                com.example.workoutapp.R.drawable.resistance_band_push_ups_3631796511),
             Exercise(3, "Sit-ups", "Lege dich auf den Rücken und hebe deinen Oberkörper an",
-                com.example.workoutapp.R.drawable.ic_sit_ups),
+                com.example.workoutapp.R.drawable.sit_ups_2_1000x1000_2124161126),
             Exercise(4, "Ausfallschritte", "Mache einen großen Schritt nach vorne und beuge das Knie",
-                com.example.workoutapp.R.drawable.ic_lunges),
+                com.example.workoutapp.R.drawable.klassische_lunges_uebung_2434463905),
             Exercise(5, "Planke", "Halte deinen Körper gerade und stütze dich auf Unterarmen und Zehenspitzen ab",
-                com.example.workoutapp.R.drawable.ic_plank)
+                com.example.workoutapp.R.drawable.body_saw_plank_3580357734)
         )
     }
 

@@ -1,17 +1,6 @@
 package com.example.workoutapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.workoutapp.ui.theme.WorkoutAppTheme
 import android.app.AlertDialog
 import android.view.View
 import android.widget.Button
@@ -20,19 +9,20 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.example.workoutapp.data.model.Exercise
 import com.example.workoutapp.data.model.WorkoutState
-import com.example.workoutapp.data.model.WorkoutSession
-import com.example.workoutapp.data.repository.WorkoutRepository
 import com.example.workoutapp.ui.viewmodel.WorkoutViewModel
+import android.media.MediaPlayer
 
-
-// MainActivity.kt
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: WorkoutViewModel
     private var isWorkoutRunning = false
     private var isPaused = false
+    private var startSound: MediaPlayer? = null
+    private var completeSound: MediaPlayer? = null
+    private var tickSound: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +30,35 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[WorkoutViewModel::class.java]
 
+        initializeSounds()
         setupUI()
         observeViewModel()
         updateCompletedWorkoutsDisplay()
+    }
+
+    private fun initializeSounds() {
+        try {
+
+            startSound = MediaPlayer.create(this, R.raw.start_317318)
+            completeSound = MediaPlayer.create(this, R.raw.stop_sound_274739)
+            tickSound = MediaPlayer.create(this, R.raw.timer_55420)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun playSound(mediaPlayer: MediaPlayer?) {
+        try {
+            mediaPlayer?.let {
+                if (it.isPlaying) {
+                    it.stop()
+                    it.prepare()
+                }
+                it.start()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun setupUI() {
@@ -87,7 +103,9 @@ class MainActivity : AppCompatActivity() {
     private fun updateExerciseDisplay(exercise: Exercise?) {
         findViewById<ImageView>(R.id.iv_exercise).apply {
             if (exercise != null) {
-                setImageResource(exercise.imageResourceId)
+                Glide.with(this@MainActivity)
+                    .load(exercise.imageResourceId)
+                    .into(this)
                 visibility = View.VISIBLE
             } else {
                 visibility = View.GONE
@@ -158,6 +176,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleStartPauseClick() {
         when {
             !isWorkoutRunning && !isPaused -> {
+                playSound(startSound)
                 viewModel.startWorkout()
             }
             isWorkoutRunning && !isPaused -> {
@@ -166,6 +185,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById<Button>(R.id.btn_start_pause).text = "Fortsetzen"
             }
             isPaused -> {
+                playSound(startSound)
                 viewModel.resumeWorkout()
                 isPaused = false
                 findViewById<Button>(R.id.btn_start_pause).text = "Pause"
@@ -181,10 +201,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showWorkoutComplete() {
+        playSound(completeSound)
         AlertDialog.Builder(this)
             .setTitle("Glückwunsch!")
             .setMessage("Du hast das Workout erfolgreich abgeschlossen!")
             .setPositiveButton("OK") { _, _ -> }
             .show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        startSound?.release()
+        completeSound?.release()
+        tickSound?.release()
     }
 }
