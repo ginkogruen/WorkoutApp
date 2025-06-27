@@ -33,12 +33,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: WorkoutViewModel
     private var isWorkoutRunning = false
     private var isPaused = false
+    private lateinit var soundPlayer: SoundPlayer
+    private var previousState: WorkoutState? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         viewModel = ViewModelProvider(this)[WorkoutViewModel::class.java]
+        soundPlayer = SoundPlayer(this)
 
         setupUI()
         observeViewModel()
@@ -115,6 +118,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateStateDisplay(state: WorkoutState) {
         val stateText = findViewById<TextView>(R.id.tv_state)
+        // Play sounds based on state transitions
         when (state) {
             WorkoutState.IDLE -> {
                 stateText.text = "Bereit zum Training?"
@@ -126,18 +130,34 @@ class MainActivity : AppCompatActivity() {
                 stateText.text = "Übung läuft"
                 isWorkoutRunning = true
                 findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                if (previousState == WorkoutState.REST) {
+                    // End Pause
+                    soundPlayer.playSound(R.raw.ep_542042__rob_marion__gasp_ui_alert_2)
+                } else {
+                    // Start Exercise
+                    soundPlayer.playSound(R.raw.se_542035__rob_marion__gasp_ui_notification_4)
+                }
             }
             WorkoutState.REST -> {
                 stateText.text = "Pause"
                 isWorkoutRunning = true
                 findViewById<Button>(R.id.btn_start_pause).text = "Pause"
+                if (previousState == WorkoutState.EXERCISE) {
+                    // End Exercise
+                    soundPlayer.playSound(R.raw.ee_542009__rob_marion__gasp_marimba_correct_2)
+                } else {
+                    // Start Pause
+                    soundPlayer.playSound(R.raw.sp_541987__rob_marion__gasp_ui_clicks_5)
+                }
             }
             WorkoutState.COMPLETED -> {
                 stateText.text = "Workout abgeschlossen!"
                 isWorkoutRunning = false
                 findViewById<Button>(R.id.btn_start_pause).text = "Start"
+                soundPlayer.playSound(R.raw.ee_542009__rob_marion__gasp_marimba_correct_2)
             }
         }
+        previousState = state
     }
 
     private fun updateProgressDisplay(current: Int, total: Int) {
@@ -186,5 +206,10 @@ class MainActivity : AppCompatActivity() {
             .setMessage("Du hast das Workout erfolgreich abgeschlossen!")
             .setPositiveButton("OK") { _, _ -> }
             .show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        soundPlayer.release()
     }
 }

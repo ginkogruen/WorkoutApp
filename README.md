@@ -88,3 +88,7 @@ Ihr erarbeitet die App im Team und jede*r gibt eine Textdatei ab, die auf das ei
 Peer Review:
 
 Du schaust Dir 2 Projekte von Deinen Kommilitoninnen an und gibst sowohl ein Star Ranking wie auch ein textuelles Feedback für das Projekt ab. Das Feedback wurde NICHT automatisch von einem KI-Tool erzeugt!
+
+## Credits
+
+Sounds for the exercise states are from [Rob Marion on freesound.org](https://freesound.org/people/Rob_Marion/)
